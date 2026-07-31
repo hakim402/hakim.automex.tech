@@ -1,26 +1,476 @@
 @import "tailwindcss";
 
+/* ============================================================
+   DESIGN SYSTEM — "Schematic" v2
+   Blueprint/drafting-table language with manual theme toggle.
+   Dark is default. Add class "light" to <html> for light mode.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* --- Core surfaces (dark blueprint, default) --- */
+  --background: #0a0e14;
+  --background-elevated: #10151f;
+  --foreground: #e8ecf2;
+  --muted: #8a94a6;
+  --border: #1e2733;
+  --border-strong: #2a3644;
+
+  /* --- Signal colors --- */
+  --accent: #f2a93b;
+  --accent-foreground: #16110a;
+  --accent-secondary: #35d0c0;
+  --danger: #ef6f6f;
+
+  /* --- Type --- */
+  --font-display: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif, sans-serif;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* --- Geometry --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --grid-cell: 32px;
+
+  /* --- Motion --- */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-trace: 1.4s;
+}
+
+/* --- Light mode (class toggle) --- */
+html.light {
+  --background: #f5f7fa;
+  --background-elevated: #ffffff;
+  --foreground: #12161d;
+  --muted: #5b6472;
+  --border: #e1e6ed;
+  --border-strong: #cbd3dd;
+  --accent: #c9791f;
+  --accent-foreground: #fff9f0;
+  --accent-secondary: #0f9488;
+}
+
+/* --- System preference fallback (when no manual choice saved) --- */
+@media (prefers-color-scheme: light) {
+  :root:not(.dark):not(.light) {
+    --background: #f5f7fa;
+    --background-elevated: #ffffff;
+    --foreground: #12161d;
+    --muted: #5b6472;
+    --border: #e1e6ed;
+    --border-strong: #cbd3dd;
+    --accent: #c9791f;
+    --accent-foreground: #fff9f0;
+    --accent-secondary: #0f9488;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-danger: var(--danger);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   BASE
+   ============================================================ */
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+code, kbd, .mono {
+  font-family: var(--font-mono);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-secondary);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   SIGNATURE — Schematic grid + trace-draw
+   ============================================================ */
+
+.bg-blueprint-grid {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+  background-position: center;
+}
+
+.trace-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: trace-draw var(--duration-trace) var(--ease-out-quart) forwards;
+}
+
+.trace-rule {
+  position: relative;
+  overflow: hidden;
+}
+.trace-rule::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-bottom: 1px solid var(--accent-secondary);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: trace-rule var(--duration-trace) var(--ease-out-quart) forwards;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: reveal 0.7s var(--ease-out-quart) forwards;
+}
+
+/* --- Staggered children — add to a parent container --- */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: reveal 0.6s var(--ease-out-quart) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.7s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.8s; }
+
+/* --- Float — subtle vertical bob --- */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* --- Glow border — animated gradient border for cards on hover --- */
+.glow-border {
+  position: relative;
+}
+.glow-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary), var(--accent));
+  background-size: 200% 200%;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradient-shift 3s ease infinite;
+}
+.glow-border:hover::before {
+  opacity: 1;
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* --- Particle dots --- */
+.bg-particle-dots {
+  background-image: radial-gradient(var(--accent-secondary) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  opacity: 0.15;
+}
+
+/* --- Shimmer text --- */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--foreground) 0%,
+    var(--accent) 40%,
+    var(--accent-secondary) 60%,
+    var(--foreground) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+@keyframes trace-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes trace-rule {
+  to { transform: scaleX(1); }
+}
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px var(--accent-secondary); }
+  50% { box-shadow: 0 0 24px var(--accent-secondary), 0 0 48px var(--accent); }
+}
+
+/* ============================================================
+   CASE STUDY PROSE
+   ============================================================ */
+
+.case-study-prose {
+  color: var(--foreground);
+  line-height: 1.75;
+}
+
+.case-study-prose h2 {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.case-study-prose h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent-secondary);
+}
+
+.case-study-prose h4 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.case-study-prose p {
+  margin-bottom: 1.25rem;
+  color: var(--muted);
+}
+
+.case-study-prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.case-study-prose a {
+  color: var(--accent-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+.case-study-prose a:hover {
+  color: var(--accent);
+}
+
+.case-study-prose ul,
+.case-study-prose ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  color: var(--muted);
+}
+
+.case-study-prose li {
+  margin-bottom: 0.5rem;
+}
+
+.case-study-prose li::marker {
+  color: var(--accent-secondary);
+}
+
+.case-study-prose blockquote {
+  margin: 2rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 3px solid var(--accent);
+  background: var(--background-elevated);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.case-study-prose blockquote p {
+  margin-bottom: 0;
+}
+
+.case-study-prose code {
+  padding: 0.15em 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--accent-secondary);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.case-study-prose pre {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.case-study-prose pre code {
+  padding: 0;
+  color: var(--foreground);
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+.case-study-prose hr {
+  margin: 3rem 0;
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.case-study-prose table {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.case-study-prose th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--foreground);
+  background: var(--background);
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.case-study-prose td {
+  padding: 0.75rem 1rem;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.case-study-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.case-study-prose figure {
+  margin: 0;
+}
+
+/* Hide raw mermaid code blocks until MermaidScanner replaces them */
+.case-study-prose pre:has(code.language-mermaid):not(:has([data-mermaid-done])),
+.case-study-prose pre:has(code.language-mermaid) code:not([data-mermaid-done]) {
+  /* Keep <pre> visible but show a subtle placeholder state */
+}
+.case-study-prose pre:has(code.language-mermaid:not([data-mermaid-done])) {
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.case-study-prose pre:has(code.language-mermaid:not([data-mermaid-done]))::after {
+  content: "Loading diagram…";
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .trace-line,
+  .trace-rule::after,
+  .reveal,
+  .stagger-children > *,
+  .float,
+  .shimmer {
+    animation: none;
+    stroke-dashoffset: 0;
+    transform: none;
+    opacity: 1;
+  }
+  body {
+    transition: none;
+  }
 }

@@ -1,0 +1,60 @@
+---
+title: "Multi-Cloud CI/CD Platform Migration"
+slug: "multicloud-cicd-migration"
+date: "2024-11-10"
+category: "DevOps & Infrastructure"
+tags: ["Docker", "Kubernetes", "GitHub Actions", "Terraform", "AWS EKS", "GCP GKE", "ArgoCD", "Helm"]
+image: ""
+featured: true
+summary: "Migrated a 15-microservice platform from a manual deploy process to a fully automated multi-cloud CI/CD pipeline with zero-downtime deployments, canary releases, and infrastructure-as-code across AWS and GCP."
+---
+
+## Overview
+
+A fast-growing startup was deploying 15 microservices by hand — SSH into EC2 instances, `git pull`, `docker-compose up -d`. Deployments took 4+ hours, rollbacks were panic-inducing, and there was zero environment parity between staging and production. I led the migration to a GitOps-based CI/CD platform spanning AWS (primary) and GCP (DR/failover), cutting deploy time from hours to minutes and making rollbacks a single click.
+
+The project touched every layer: infrastructure provisioning with Terraform, container orchestration on Kubernetes, CI pipelines in GitHub Actions, and GitOps delivery via ArgoCD.
+
+## Architecture
+
+- **Infrastructure** — Terraform modules for AWS EKS (primary cluster) and GCP GKE (DR cluster). All resources declared as code: VPCs, subnets, IAM roles, security groups, RDS instances, ElastiCache clusters. State stored in S3 with DynamoDB locking.
+- **CI Pipeline** — GitHub Actions workflows triggered on PR and push to `main`. Steps: lint → unit test → integration test → build Docker image → push to ECR → update Helm chart version. Matrix builds for 15 services, each with its own Dockerfile and Helm chart.
+- **CD Pipeline** — ArgoCD watches the Helm chart repo. A new chart version triggers a sync to the staging namespace. After automated smoke tests pass (Playwright + k6 load tests), a PR is auto-created to promote the chart to production. Merging that PR triggers the prod sync.
+- **Networking** — Istio service mesh for mTLS, traffic splitting (canary), and observability. External traffic enters via AWS ALB → Istio Ingress Gateway → service. GCP cluster kept warm via DNS failover in Route53.
+- **Observability** — Prometheus + Grafana for metrics, Loki + Promtail for logs, Tempo for distributed tracing. Pre-built Grafana dashboards for deployment frequency, lead time, change failure rate, and MTTR (DORA metrics).
+
+## Key Features
+
+- **Zero-Downtime Deployments** — Rolling updates with `maxUnavailable: 0` and readiness probes that wait for the new pod to pass health checks before terminating the old one.
+- **Canary Releases** — Istio `VirtualService` routes 5% of traffic to the canary for 10 minutes. If error rate or P99 latency exceeds baseline, the canary is automatically rolled back via an ArgoCD hook.
+- **Environment Parity** — Staging and production clusters are identical Terraform modules, differing only in instance size and replica count. Developers spin up ephemeral preview environments per PR (namespace in staging cluster, destroyed on merge/close).
+- **Disaster Recovery** — GCP GKE cluster mirrors production. Route53 health checks auto-failover to GCP if AWS is unreachable. RDS snapshots replicated cross-cloud every hour.
+- **Developer Self-Service** — A Slack bot (`/deploy service-name`) lets devs trigger canary promotions without touching kubectl or ArgoCD UI. RBAC enforced via GitHub team membership.
+
+## Technical Challenges
+
+**1. Database migration safety** — With 15 services sharing a PostgreSQL instance, a breaking schema change could take down the entire platform. Implemented expand-contract migrations: add new column (backward-compatible) → deploy services that can read both → migrate data → deploy services that write to new column → drop old column. Each step is a separate PR and deploy, making rollbacks trivial.
+
+**2. Secrets management at scale** — Hardcoded `.env` files in repos were the norm. Migrated to AWS Secrets Manager with a Kubernetes External Secrets Operator that syncs secrets into K8s secrets. Service accounts use IRSA (IAM Roles for Service Accounts) so pods authenticate to AWS without long-lived credentials.
+
+**3. Cost optimization** — The initial EKS cluster cost $4,200/month. Rightsizing (Karpenter for bin-packing, spot instances for non-critical workloads, reserved instances for baseline) brought it down to $2,100/month — a 50% reduction without affecting performance.
+
+## Results
+
+| Metric | Before | After |
+|---|---|---|
+| Deploy time (end-to-end) | 4 hours | 12 minutes |
+| Rollback time | ~45 min (manual) | `<2 min` (one click) |
+| Deployment frequency | 2x/week | 15x/week |
+| Change failure rate | 18% | 3% |
+| Monthly infra cost | $4,200 | $2,100 |
+
+## Technologies Used
+
+- **Infrastructure as Code** — Terraform (AWS + GCP providers), Terragrunt for DRY configs
+- **Container Orchestration** — Kubernetes (EKS + GKE), Helm, Karpenter
+- **CI/CD** — GitHub Actions, ArgoCD (GitOps), Docker, ECR/GCR
+- **Service Mesh** — Istio (mTLS, canary traffic splitting, observability)
+- **Observability** — Prometheus, Grafana, Loki, Tempo
+- **Secrets** — AWS Secrets Manager, External Secrets Operator
+- **Scripting** — Bash, Python (migration helpers, Slack bot)

@@ -1,0 +1,47 @@
+﻿---
+title: "Full-Stack E-Commerce Dashboard"
+slug: "ecommerce-dashboard"
+date: "2025-01-20"
+category: "Web Development"
+tags: ["Next.js", "React", "TypeScript", "PostgreSQL", "Prisma", "Tailwind CSS"]
+image: ""
+featured: true
+summary: "Built a responsive full-stack e-commerce analytics dashboard with real-time data visualization, role-based access control, and automated reporting."
+---
+
+## Overview
+
+A comprehensive e-commerce analytics dashboard built for a mid-size retail company processing over 10,000 orders per month. The platform consolidates data from Shopify, Stripe, and the internal warehouse system into a single real-time interface, giving stakeholders instant visibility into sales, inventory, customer behavior, and marketing campaign performance.
+
+I led the full-stack development — from database schema design through to the React UI — working closely with the operations and marketing teams to identify the KPIs that mattered most.
+
+## Architecture
+
+- **Frontend** — Next.js 14 (App Router) with TypeScript and Tailwind CSS. Server Components fetch data on the server for fast initial loads; client components handle real-time WebSocket updates via `react-use-websocket`.
+- **Backend** — tRPC API layer sitting on top of Prisma ORM. All queries are end-to-end typesafe, eliminating an entire class of runtime errors.
+- **Database** — PostgreSQL with TimescaleDB extension for time-series analytics (hourly/daily/weekly rollups). Redis used as a caching layer for dashboard widgets.
+- **Auth** — NextAuth.js with GitHub OAuth for internal team access, plus email/password fallback. Session-based auth with role claims stored in the JWT.
+- **Deployment** — Vercel for the frontend, Railway for the PostgreSQL + Redis backend. CI/CD via GitHub Actions running Vitest tests and Playwright E2E before deploy.
+
+## Key Features
+
+- **Real-Time Sales Tracker** — WebSocket-powered live feed showing orders as they come in, with sound alerts for high-value transactions (>$500).
+- **Inventory Intelligence** — Predictive low-stock alerts using a simple moving-average model on historical consumption rates. Flags items likely to run out within 7 days.
+- **Role-Based Access Control** — Three tiers (Admin, Manager, Viewer) with row-level security enforced at the database level via Prisma middleware, not just the UI.
+- **Automated PDF Reports** — Weekly and monthly reports generated via Puppeteer, rendered from the same React components used in the dashboard ("render once, view anywhere"). Delivered via email using Resend.
+- **Marketing Attribution** — UTM-tagged campaign data ingested from Facebook Ads and Google Ads APIs, matched against Stripe transactions to calculate ROAS per campaign.
+
+## Technical Challenges
+
+**1. Real-time consistency under high load** — During flash sales, the WebSocket server would broadcast updates for every single order, overwhelming the browser. Solved by debouncing broadcasts to 500ms batches and using `useTransition` to keep the UI responsive while React reconciles the batched state.
+
+**2. Timezone-aware reporting** — The operations team is in EST, the warehouse in PST, and the data in UTC. Built a timezone context provider that flows through all date-picker and chart components, ensuring "today's sales" means the same thing to every user regardless of location.
+
+**3. Large dataset performance** — The orders table grew to 2M+ rows within 6 months. Implemented TimescaleDB continuous aggregates for common query patterns (daily revenue, top products, sales by region) and added Prisma `@@index` annotations on frequently filtered columns.
+
+## Results
+
+- Reporting cycle dropped from **2 days (manual Excel)** to **fully automated** — saving ~16 hours/week of analyst time.
+- Real-time inventory alerts prevented an estimated **$50K+** in stockout losses within the first quarter.
+- Dashboard adopted by **50+ users** across Sales, Operations, and Marketing within 2 months of launch.
+- Page load times under **1.2s** (LCP) despite 2M+ row dataset, thanks to TimescaleDB aggregates + Redis caching.

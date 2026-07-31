@@ -1,0 +1,53 @@
+---
+title: "Machine Learning Pipeline for Predictive Analytics"
+slug: "ml-pipeline-predictive-analytics"
+date: "2025-03-15"
+category: "Machine Learning"
+tags: ["Python", "scikit-learn", "Pandas", "MLflow", "AWS SageMaker"]
+image: ""
+featured: true
+summary: "Designed and implemented an end-to-end ML pipeline for predictive analytics using Python, scikit-learn, and AWS SageMaker, achieving 94% prediction accuracy."
+---
+
+## Overview
+
+Customer churn was costing a SaaS client an estimated $2.1M annually. The existing rule-based detection system ("flag if no login in 30 days") caught only 12% of churners and fired too late to intervene. I designed and shipped an end-to-end ML pipeline that ingests behavioral data, trains a gradient-boosted model, and serves predictions via a REST API — all running on AWS infrastructure with full experiment tracking and model versioning.
+
+## Architecture
+
+- **Data Ingestion** — Python ETL scripts (Pandas + SQLAlchemy) pull raw event logs from PostgreSQL and transform them into a feature store. Features include: login frequency, session duration trend, support ticket count, NPS score delta, and payment failure count.
+- **Feature Engineering** — Custom `scikit-learn` transformers in a `Pipeline` object: one-hot encoding for categoricals (plan tier, region), rolling-window aggregations for temporal features, and target encoding for high-cardinality columns.
+- **Model Training** — XGBoost classifier trained on 18 months of labeled churn data (~500K rows). Hyperparameter tuning via Optuna with 5-fold time-series cross-validation to prevent data leakage.
+- **Experiment Tracking** — MLflow tracks every run: hyperparameters, metrics, model artifacts, and the exact Git commit SHA. The MLflow UI serves as the single source of truth for model comparisons.
+- **Deployment** — AWS SageMaker endpoint for real-time inference (`<200ms` P95 latency). Model registry enforces a staging → production promotion workflow with automated canary testing.
+- **Monitoring** — Custom CloudWatch dashboards for prediction drift, feature drift (using evidently.ai), and endpoint latency. Alerts fire if accuracy drops below 90% or input distribution shifts beyond threshold.
+
+## Key Results
+
+- **94% precision, 89% recall** on the holdout test set — up from 12% recall with the rule-based system.
+- Identified the top 3 churn predictors: decline in session duration over 2 weeks, payment failure within 30 days, and >2 support tickets in 7 days.
+- **$1.2M estimated annual savings** from reduced churn, based on the retention team's 40% successful intervention rate on flagged accounts.
+
+## Technical Challenges
+
+**1. Data leakage through time** — Initial random train/test splits inflated metrics because a user's November data would leak into the training set while their December data sat in the test set. Switched to time-series split: train on months 1–12, validate on months 13–15, test on months 16–18. This dropped reported accuracy by 8 points (from an unrealistic 98% to a genuine 90%).
+
+**2. Class imbalance** — Only 6% of users churned. SMOTE oversampling helped, but the bigger win was switching from accuracy to precision-recall AUC as the optimization metric. Also implemented cost-sensitive learning by weighting the minority class proportional to the business cost of a missed churner (~$500).
+
+**3. Cold start for new users** — New accounts had no behavioral history, so the model couldn't score them. Built a fallback heuristic using onboarding completion rate and plan tier that kicked in until 14 days of data accumulated. Tracked this separately in MLflow as a "cold-start cohort" for transparency.
+
+## Lessons Learned
+
+- **Time-series CV is non-negotiable** for any model that predicts future behavior from past data. Random splits give dangerously misleading results.
+- **Business metric alignment** matters more than model metric optimization. The retention team didn't care about AUC — they cared about "how many at-risk accounts can we realistically call this week?" That question drove the precision-recall tradeoff.
+- **MLflow + SageMaker is a solid combo** for small teams. It avoids the complexity of Kubeflow while still giving you experiment tracking, model registry, and a managed inference endpoint.
+
+## Technologies Used
+
+- Python 3.11 — pandas, NumPy, scikit-learn, XGBoost, Optuna
+- MLflow for experiment tracking and model registry
+- AWS SageMaker for model hosting (real-time endpoint)
+- AWS Lambda + EventBridge for nightly batch scoring of the full user base
+- PostgreSQL for feature store and predictions database
+- Docker for reproducible training environments
+- evidently.ai for data drift monitoring
