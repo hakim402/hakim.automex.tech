@@ -117,7 +117,10 @@
         pre.replaceWith(figure);
       })
       .catch(function () {
-        // leave raw block visible on render failure
+        // Render failed — remove the marker so a future scan retries.
+        // On SPA navigation, React may re-parent the DOM element during
+        // reconciliation, causing mermaid.render() to fail transiently.
+        el.removeAttribute("data-mermaid-done");
       });
   }
 
@@ -146,18 +149,47 @@
   // === Initial render ===
   renderAll();
 
-  // === Watch for DOM changes (SPA navigation, dynamic content) ===
-  // Debounced full-document scan — more reliable than inspecting addedNodes.
-  // React reconciliation on client-side navigation may reparent existing
-  // <pre><code> nodes rather than adding new ones, which means addedNodes
-  // won't contain the mermaid blocks. A debounced full scan catches them all.
+  // === Detect Next.js client-side SPA navigation ===
+  // RSC payloads stream via multiple self.__next_f.push() chunks.
+  // React renders each chunk as it arrives, and the MutationObserver
+  // resets its debounce on every chunk. But if a render fails before
+  // the final chunk (Bug: data-mermaid-done blocks retries), the
+  // diagram stays raw forever. So we also hook into history APIs
+  // and schedule a scan well after all chunks have landed.
+
+  function scheduleScan() {
+    setTimeout(function () {
+      renderAll();
+    }, 400);
+  }
+
+  // Monkey-patch history.pushState (Next.js <Link> navigation)
+  var origPush = history.pushState;
+  history.pushState = function () {
+    origPush.apply(this, arguments);
+    scheduleScan();
+  };
+
+  // Monkey-patch history.replaceState
+  var origReplace = history.replaceState;
+  history.replaceState = function () {
+    origReplace.apply(this, arguments);
+    scheduleScan();
+  };
+
+  // Listen for popstate (back/forward navigation)
+  window.addEventListener("popstate", function () {
+    scheduleScan();
+  });
+
+  // === MutationObserver fallback for dynamic content (non-navigation DOM changes) ===
   var scanTimer = null;
   var contentObserver = new MutationObserver(function () {
     if (scanTimer !== null) clearTimeout(scanTimer);
     scanTimer = setTimeout(function () {
       renderAll();
       scanTimer = null;
-    }, 100);
+    }, 300);
   });
 
   contentObserver.observe(document.body, {
