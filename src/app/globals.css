@@ -16,7 +16,7 @@
   --border-strong: #2a3644;
 
   /* --- Signal colors --- */
-  --accent: #f2a93b;
+  --accent: #00a6ff;
   --accent-foreground: #16110a;
   --accent-secondary: #35d0c0;
   --danger: #ef6f6f;
@@ -45,7 +45,7 @@ html.light {
   --muted: #5b6472;
   --border: #e1e6ed;
   --border-strong: #cbd3dd;
-  --accent: #c9791f;
+  --accent: #00a6ff;
   --accent-foreground: #fff9f0;
   --accent-secondary: #0f9488;
 }
@@ -166,6 +166,7 @@ code, kbd, .mono {
   transform: scaleX(0);
   transform-origin: left;
   animation: trace-rule var(--duration-trace) var(--ease-out-quart) forwards;
+  pointer-events: none;
 }
 
 .reveal {

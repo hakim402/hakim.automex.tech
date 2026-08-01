@@ -1,35 +1,28 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light";
 
 interface ThemeContextValue {
   theme: Theme;
-  toggle: () => void;
+  toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue>({
-  theme: "dark",
-  toggle: () => {},
-});
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function useTheme() {
-  return useContext(ThemeContext);
+  const ctx = useContext(ThemeContext);
+  if (!ctx) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return ctx;
 }
 
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: light)").matches
-    ? "light"
-    : "dark";
-}
-
-function getStoredTheme(): Theme | null {
-  if (typeof window === "undefined") return null;
-  const stored = localStorage.getItem("theme");
-  if (stored === "dark" || stored === "light") return stored;
-  return null;
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  root.classList.toggle("light", theme === "light");
+  root.classList.toggle("dark", theme === "dark");
 }
 
 export default function ThemeProvider({
@@ -37,37 +30,27 @@ export default function ThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // Default matches the inline no-flash script in layout.tsx (dark-first).
   const [theme, setTheme] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
 
-  // On mount: read stored preference or system default
   useEffect(() => {
-    const stored = getStoredTheme();
-    const resolved = stored ?? getSystemTheme();
-    setTheme(resolved);
-    setMounted(true);
+    const stored = window.localStorage.getItem("theme");
+    const initial: Theme = stored === "light" ? "light" : "dark";
+    setTheme(initial);
+    applyTheme(initial);
   }, []);
 
-  // Apply class to <html> and persist
-  useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("theme", theme);
-  }, [theme, mounted]);
-
-  const toggle = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, []);
-
-  // Avoid hydration flash — render children only after mount
-  if (!mounted) {
-    return <>{children}</>;
+  function toggleTheme() {
+    setTheme((prev) => {
+      const next: Theme = prev === "dark" ? "light" : "dark";
+      window.localStorage.setItem("theme", next);
+      applyTheme(next);
+      return next;
+    });
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

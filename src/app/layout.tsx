@@ -39,6 +39,16 @@ export const metadata: Metadata = {
   },
 };
 
+// Runs before hydration so the saved theme applies before first paint —
+// without this, ThemeProvider's useEffect would cause a visible flash.
+const NO_FLASH_SCRIPT = `
+  try {
+    var stored = localStorage.getItem("theme");
+    var theme = stored === "light" || stored === "dark" ? stored : "dark";
+    document.documentElement.classList.add(theme);
+  } catch (e) {}
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,8 +58,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
+      </head>
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <ThemeProvider>
           <Header />
           <main className="flex-1">{children}</main>

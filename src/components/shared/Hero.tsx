@@ -1,9 +1,41 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import Link from "next/link";
-import { ArrowRight, Download, MapPin } from "lucide-react";
+import { ArrowRight, Download, ExternalLink, Mail, MapPin } from "lucide-react";
 import { SOCIAL_LINKS } from "@/lib/constants";
+
+const ROLES = [
+  "Full-Stack Developer",
+  "Chief Technology Officer",
+  "Founder",
+  "Aspiring AI/Security Researcher",
+];
+
+const COMPANIES: { name: string; href?: string; favicon?: string }[] = [
+  {
+    name: "JAHEZ TRADE CO",
+    href: "https://jahez.online/en",
+    favicon: "https://www.google.com/s2/favicons?domain=jahez.online&sz=64",
+  },
+  {
+    name: "IDWE",
+    href: "https://idwe.tech/",
+    favicon: "https://www.google.com/s2/favicons?domain=idwe.tech&sz=64",
+  },
+  {
+    name: "AUTOMEX",
+    href: "https://automex.tech/en",
+    favicon: "https://www.google.com/s2/favicons?domain=automex.tech&sz=64",
+  },
+  {
+    name: "Infinity Enterprise Solutions",
+    href: "https://infinity-solutions.pro/",
+    favicon:
+      "https://www.google.com/s2/favicons?domain=infinity-solutions.pro&sz=64",
+  },
+];
 
 function GithubIcon({ className }: { className?: string }) {
   return (
@@ -35,422 +67,245 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-/** Subtle floating particle dots on a canvas backdrop */
-function ParticleField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+/** Photo card that tilts gently toward the cursor — disabled for prefers-reduced-motion */
+function TiltCard() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    const particles: {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      r: number;
-    }[] = [];
-
-    function resize() {
-      canvas!.width = canvas!.offsetWidth;
-      canvas!.height = canvas!.offsetHeight;
-    }
-    resize();
-    window.addEventListener("resize", resize);
-
-    // Create particles
-    for (let i = 0; i < 60; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 1.5 + 0.5,
-      });
-    }
-
-    function draw() {
-      if (!canvas || !ctx) return;
-      const cw = canvas.width;
-      const ch = canvas.height;
-      ctx.clearRect(0, 0, cw, ch);
-      const style = getComputedStyle(document.documentElement);
-      const color =
-        style.getPropertyValue("--accent-secondary").trim() || "#35d0c0";
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > cw) p.vx *= -1;
-        if (p.y < 0 || p.y > ch) p.vy *= -1;
-
-        ctx!.beginPath();
-        ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx!.fillStyle = color;
-        ctx!.globalAlpha = 0.3;
-        ctx!.fill();
-      }
-
-      // Draw connections between nearby particles
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx!.beginPath();
-            ctx!.moveTo(particles[i].x, particles[i].y);
-            ctx!.lineTo(particles[j].x, particles[j].y);
-            ctx!.strokeStyle = color;
-            ctx!.globalAlpha = 0.06 * (1 - dist / 100);
-            ctx!.lineWidth = 0.5;
-            ctx!.stroke();
-          }
-        }
-      }
-
-      animId = requestAnimationFrame(draw);
-    }
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-    };
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
+  function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
+    if (reducedMotion) return;
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(900px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) scale(1.01)`;
+  }
+
+  function handleMouseLeave() {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transform =
+      "perspective(900px) rotateY(0deg) rotateX(0deg) scale(1)";
+  }
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="pointer-events-none absolute inset-0 h-full w-full"
-    />
+    <div
+      className="float w-full max-w-sm"
+      style={{ perspective: "900px" }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div
+        ref={cardRef}
+        className="glow-border relative aspect-[4/5] overflow-hidden rounded-2xl border border-border/50 bg-background-elevated transition-transform duration-200 ease-out will-change-transform"
+      >
+        <img
+          src="/images/hakim/hakim2.png"
+          alt="Hakimullah Rahimi Safi"
+          className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-background/70 via-transparent to-transparent" />
+
+        {/* Blueprint corner ticks */}
+        <span className="absolute left-3 top-3 h-3 w-3 border-l border-t border-accent-secondary/60" />
+        <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-accent-secondary/60" />
+        <span className="absolute bottom-3 left-3 h-3 w-3 border-b border-l border-accent-secondary/60" />
+        <span className="absolute bottom-3 right-3 h-3 w-3 border-b border-r border-accent-secondary/60" />
+      </div>
+    </div>
   );
 }
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-blueprint-grid px-6 pb-24 pt-14 sm:pb-36 sm:pt-24">
-      {/* Particle field */}
-      <ParticleField />
-
-      {/* Ambient glows */}
-      <div className="pointer-events-none absolute -top-60 left-1/2 h-150 w-225 -translate-x-1/2 rounded-full bg-accent/5 blur-[140px]" />
-      <div className="pointer-events-none absolute top-1/3 -right-20 h-75 w-100 rounded-full bg-accent-secondary/5 blur-[100px]" />
-
+    <section className="relative overflow-hidden px-6 pb-16 pt-14 sm:pt-20">
       <div className="relative mx-auto max-w-6xl">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start lg:gap-20">
-          {/* Text column */}
-          <div className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left stagger-children">
-            {/* Heading with shimmer accent */}
-            <h1 className="max-w-2xl font-display text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Building{" "}
-              <span className="shimmer">tomorrow&apos;s infrastructure</span>,
-              one system at a time
-            </h1>
+        <div className="flex flex-col gap-10 lg:flex-row lg:gap-14">
+          <div className="flex flex-1 flex-col gap-10 lg:flex-row lg:items-center lg:gap-16">
+            {/* Text column */}
+            <div className="flex flex-1 flex-col items-center text-center lg:items-start lg:text-left stagger-children">
+              <span className="mono text-[11px] uppercase tracking-[0.2em] text-accent-secondary">
+                Hello, I&apos;m
+              </span>
 
-            {/* Trace underline */}
-            <div className="trace-rule mt-4 h-0.5 w-24" />
+              <h1 className="mt-2 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl">
+                Hakimullah <span className="shimmer">Rahimi Safi</span>
+              </h1>
 
-            {/* Subtitle */}
-            <p className="max-w-xl text-lg leading-relaxed text-muted">
-              Full-stack engineer crafting scalable systems, ML pipelines, and
-              cloud infrastructure. Pursuing graduate studies in Canada to push
-              the boundaries of distributed systems and applied machine
-              learning.
-            </p>
+              {/* Mobile-only role line */}
+              <p className="mono mt-3 text-xs uppercase tracking-wide text-muted lg:hidden">
+                {ROLES.join(" · ")}
+              </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-6">
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg shadow-accent/25 transition-all hover:bg-accent-secondary hover:text-background hover:shadow-accent-secondary/30 hover:-translate-y-0.5"
-              >
-                View Case Studies
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background-elevated px-6 py-3 text-sm font-semibold text-foreground transition-all hover:border-accent-secondary hover:text-accent-secondary hover:-translate-y-0.5"
-              >
-                Get in Touch
-              </Link>
-              <a
-                href="/cv/Hakimullah_Rahimi_Safi_Resume.pdf"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium text-muted transition-colors hover:text-foreground"
-              >
-                <Download className="h-4 w-4" />
-                Download CV
-              </a>
-            </div>
+              <div className="trace-rule mt-5 h-0.5 w-16" />
 
-            {/* Social + location */}
-            <div className="flex items-center gap-5 pt-5">
-              <a
-                href={SOCIAL_LINKS.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted transition-colors hover:text-foreground"
-                aria-label="GitHub"
-              >
-                <GithubIcon className="h-5 w-5" />
-              </a>
-              <a
-                href={SOCIAL_LINKS.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted transition-colors hover:text-foreground"
-                aria-label="LinkedIn"
-              >
-                <LinkedinIcon className="h-5 w-5" />
-              </a>
-              <span className="inline-flex items-center gap-1 text-xs text-muted">
+              <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
+                4+ years shipping enterprise platforms and secure web
+                applications as a CTO and founder now preparing for graduate
+                research in Artificial Intelligence and Cybersecurity.
+              </p>
+
+              {/* CTAs — one primary, one secondary text link */}
+              <div className="flex items-center gap-3 pt-6">
+                <Link
+                  href="/projects"
+                  className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold text-accent-foreground shadow-lg shadow-accent/25 transition-all hover:bg-accent-secondary hover:text-background sm:px-6 sm:py-3 sm:text-sm"
+                >
+                  Explore Case Studies
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+
+                <a
+                  href="/cv/Hakimullah_Rahimi_Safi_Resume.pdf"
+                  className="inline-flex items-center gap-2 rounded-lg px-2 py-2.5 text-xs font-medium text-muted transition-colors hover:text-foreground sm:px-3 sm:py-3 sm:text-sm"
+                >
+                  <Download className="h-4 w-4" />
+                  Download CV
+                </a>
+              </div>
+
+              <span className="mt-5 inline-flex items-center gap-1 text-xs text-muted">
                 <MapPin className="h-3 w-3 text-accent-secondary" />
-                Afghanistan
+                Kabul, Afghanistan
               </span>
             </div>
-          </div>
 
-          {/* Visual column */}
-          <div className="relative flex-1">
-            {/* Glow-border card */}
-            <div className="float glow-border relative mx-auto aspect-square max-w-95 overflow-hidden rounded-2xl border border-border/50 bg-background-elevated p-1">
-              {/* Blueprint SVG overlay */}
-              <svg
-                className="absolute inset-0 h-full w-full"
-                viewBox="0 0 380 380"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+            {/* Role rail — divider between text and photo, desktop only */}
+            <div className="hidden shrink-0 flex-col justify-center gap-5 lg:flex">
+              {ROLES.map((role, i) => (
+                <div key={role} className="flex items-center gap-3">
+                  <span
+                    className={`h-px w-6 ${i === 0 ? "bg-accent" : "bg-border"}`}
+                  />
+                  <span
+                    className={`mono whitespace-nowrap text-[11px] uppercase tracking-[0.15em] ${
+                      i === 0 ? "text-accent" : "text-muted"
+                    }`}
+                  >
+                    {role}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Photo column with connector badges + status pill */}
+            <div className="relative flex flex-1 justify-center pb-8 lg:justify-end lg:pb-0">
+              <TiltCard />
+
+              {/* Connector — GitHub, top-left */}
+              <div className="absolute -left-2 top-8 hidden items-center gap-2 sm:flex">
+                <a
+                  href={SOCIAL_LINKS.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background-elevated text-muted transition-colors hover:border-accent-secondary hover:text-accent-secondary"
+                >
+                  <GithubIcon className="h-4 w-4" />
+                </a>
+                <span className="h-px w-8 bg-border" />
+              </div>
+
+              {/* Connector — LinkedIn, mid-right */}
+              <div className="absolute -right-2 top-1/3 hidden items-center gap-2 sm:flex">
+                <span className="h-px w-8 bg-border" />
+                <a
+                  href={SOCIAL_LINKS.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background-elevated text-muted transition-colors hover:border-accent-secondary hover:text-accent-secondary"
+                >
+                  <LinkedinIcon className="h-4 w-4" />
+                </a>
+              </div>
+
+              {/* Connector — Email, bottom-left */}
+              <div className="absolute -left-2 bottom-24 hidden items-center gap-2 sm:flex">
+                <a
+                  href={SOCIAL_LINKS.email}
+                  aria-label="Email"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background-elevated text-muted transition-colors hover:border-accent-secondary hover:text-accent-secondary"
+                >
+                  <Mail className="h-4 w-4" />
+                </a>
+                <span className="h-px w-8 bg-border" />
+              </div>
+
+              {/* Status pill */}
+              <div
+                className="relative mt-4 w-full max-w-sm rounded-xl border border-border bg-background-elevated px-5 py-4 shadow-2xl reveal lg:absolute lg:-bottom-6 lg:-right-6 lg:mt-0 lg:w-72"
+                style={{ animationDelay: "0.8s" }}
               >
-                <rect
-                  x="24"
-                  y="24"
-                  width="332"
-                  height="332"
-                  rx="12"
-                  className="trace-line"
-                  stroke="var(--accent-secondary)"
-                  strokeWidth="1"
-                  strokeOpacity="0.35"
-                  strokeDasharray="1100"
-                />
-                <line
-                  x1="24"
-                  y1="24"
-                  x2="356"
-                  y2="356"
-                  className="trace-line"
-                  stroke="var(--border-strong)"
-                  strokeWidth="0.5"
-                  strokeOpacity="0.25"
-                  strokeDasharray="850"
-                  style={{ animationDelay: "0.3s" }}
-                />
-                <line
-                  x1="356"
-                  y1="24"
-                  x2="24"
-                  y2="356"
-                  className="trace-line"
-                  stroke="var(--border-strong)"
-                  strokeWidth="0.5"
-                  strokeOpacity="0.25"
-                  strokeDasharray="850"
-                  style={{ animationDelay: "0.3s" }}
-                />
-                {/* Center hub */}
-                <circle
-                  cx="190"
-                  cy="190"
-                  r="45"
-                  className="trace-line"
-                  stroke="var(--accent)"
-                  strokeWidth="1.5"
-                  strokeOpacity="0.45"
-                  strokeDasharray="650"
-                  fill="var(--accent)"
-                  fillOpacity="0.04"
-                />
-                {/* Radial connections */}
-                <line
-                  x1="190"
-                  y1="145"
-                  x2="190"
-                  y2="72"
-                  className="trace-line"
-                  stroke="var(--accent-secondary)"
-                  strokeWidth="1"
-                  strokeOpacity="0.4"
-                  strokeDasharray="450"
-                  style={{ animationDelay: "0.6s" }}
-                />
-                <line
-                  x1="190"
-                  y1="235"
-                  x2="190"
-                  y2="308"
-                  className="trace-line"
-                  stroke="var(--accent-secondary)"
-                  strokeWidth="1"
-                  strokeOpacity="0.4"
-                  strokeDasharray="450"
-                  style={{ animationDelay: "0.6s" }}
-                />
-                <line
-                  x1="145"
-                  y1="190"
-                  x2="72"
-                  y2="190"
-                  className="trace-line"
-                  stroke="var(--accent-secondary)"
-                  strokeWidth="1"
-                  strokeOpacity="0.4"
-                  strokeDasharray="450"
-                  style={{ animationDelay: "0.6s" }}
-                />
-                <line
-                  x1="235"
-                  y1="190"
-                  x2="308"
-                  y2="190"
-                  className="trace-line"
-                  stroke="var(--accent-secondary)"
-                  strokeWidth="1"
-                  strokeOpacity="0.4"
-                  strokeDasharray="450"
-                  style={{ animationDelay: "0.6s" }}
-                />
-                {/* Node points */}
-                <circle
-                  cx="190"
-                  cy="72"
-                  r="3"
-                  fill="var(--accent-secondary)"
-                  fillOpacity="0.6"
-                />
-                <circle
-                  cx="190"
-                  cy="308"
-                  r="3"
-                  fill="var(--accent-secondary)"
-                  fillOpacity="0.6"
-                />
-                <circle
-                  cx="72"
-                  cy="190"
-                  r="3"
-                  fill="var(--accent-secondary)"
-                  fillOpacity="0.6"
-                />
-                <circle
-                  cx="308"
-                  cy="190"
-                  r="3"
-                  fill="var(--accent-secondary)"
-                  fillOpacity="0.6"
-                />
-                {/* Labels */}
-                <text
-                  x="190"
-                  y="64"
-                  textAnchor="middle"
-                  className="mono"
-                  fill="var(--muted)"
-                  fontSize="9"
-                  fontFamily="var(--font-mono)"
-                >
-                  CLOUD
-                </text>
-                <text
-                  x="190"
-                  y="322"
-                  textAnchor="middle"
-                  className="mono"
-                  fill="var(--muted)"
-                  fontSize="9"
-                  fontFamily="var(--font-mono)"
-                >
-                  DATA
-                </text>
-                <text
-                  x="64"
-                  y="194"
-                  textAnchor="middle"
-                  className="mono"
-                  fill="var(--muted)"
-                  fontSize="9"
-                  fontFamily="var(--font-mono)"
-                >
-                  API
-                </text>
-                <text
-                  x="316"
-                  y="194"
-                  textAnchor="middle"
-                  className="mono"
-                  fill="var(--muted)"
-                  fontSize="9"
-                  fontFamily="var(--font-mono)"
-                >
-                  ML
-                </text>
-                <text
-                  x="190"
-                  y="194"
-                  textAnchor="middle"
-                  className="mono"
-                  fill="var(--accent)"
-                  fontSize="11"
-                  fontWeight="600"
-                  fontFamily="var(--font-mono)"
-                >
-                  SYS
-                </text>
-              </svg>
-
-              {/* Profile image with hover reveal */}
-              <img
-                src="/images/hakim/hakimrs.jpeg"
-                alt="Profile"
-                className="relative z-10 h-full w-full rounded-xl object-cover opacity-0 mix-blend-luminosity grayscale transition-all duration-1000 hover:opacity-100 hover:mix-blend-normal hover:grayscale-0"
-                loading="eager"
-              />
-            </div>
-
-            {/* Floating stat card — top right */}
-            <div
-              className="absolute -right-4 -top-4 rounded-xl border border-border bg-background-elevated px-5 py-4 shadow-2xl reveal"
-              style={{ animationDelay: "1s" }}
-            >
-              <p className="mono text-[10px] font-medium uppercase tracking-[0.15em] text-muted">
-                Projects
-              </p>
-              <p className="mt-1 font-display text-3xl font-bold text-foreground">
-                3+
-              </p>
-              <p className="mt-0.5 text-[11px] text-muted">
-                Production systems
-              </p>
-            </div>
-
-            {/* Floating stat card — bottom left */}
-            <div
-              className="absolute -bottom-4 -left-4 rounded-xl border border-border bg-background-elevated px-5 py-4 shadow-2xl reveal"
-              style={{ animationDelay: "1.3s" }}
-            >
-              <p className="mono text-[10px] font-medium uppercase tracking-[0.15em] text-muted">
-                Target
-              </p>
-              <p className="mt-1 font-display text-3xl font-bold text-foreground">
-                M.Sc.
-              </p>
-              <p className="mt-0.5 text-[11px] text-muted">Computer Science</p>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-accent-secondary" />
+                  <p className="mono text-[10px] uppercase tracking-[0.15em] text-accent-secondary">
+                    Open to
+                  </p>
+                </div>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  Research collaborations &amp; grad programs
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  Applying Fall 2026 · Canada / USA
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Proof strip */}
+        <div className="trace-rule mt-20 border-t border-border pt-8 sm:mt-24">
+          <p className="mono mb-4 text-center text-[10px] uppercase tracking-[0.2em] text-muted lg:text-left">
+            Built for / founded
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 lg:justify-start mb-2">
+            {COMPANIES.map((company) =>
+              company.href ? (
+                <a
+                  key={company.name}
+                  href={company.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mono group flex items-center gap-2 text-sm text-muted transition-colors hover:text-accent-secondary"
+                >
+                  {company.favicon && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={company.favicon}
+                      alt=""
+                      className="h-4 w-4 rounded-sm"
+                      loading="lazy"
+                    />
+                  )}
+                  {company.name}
+                  <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                </a>
+              ) : (
+                <span key={company.name} className="mono text-sm text-muted/70">
+                  {company.name}
+                </span>
+              ),
+            )}
+          </div>
+        </div>
+
+        {/* Scroll cue */}
+        <div className="mt-14 flex flex-col items-center gap-2">
+          <span className="mono text-[10px] uppercase tracking-[0.3em] text-muted">
+            Scroll
+          </span>
+          <span className="h-8 w-px animate-pulse bg-border-strong" />
         </div>
       </div>
     </section>
