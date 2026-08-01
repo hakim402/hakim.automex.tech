@@ -1,13 +1,14 @@
 /**
- * Mermaid Diagram Renderer for static export.
+ * Mermaid Diagram Renderer — lightweight fallback.
  *
- * Loaded via next/script with afterInteractive strategy.
- * Uses MutationObserver to catch code blocks after React
- * hydrates the RSC payload into real DOM elements.
+ * Project pages now use the MermaidDiagram React component
+ * (src/components/mdx/MermaidDiagram.tsx) which handles rendering,
+ * SPA navigation, and theme changes via React's own lifecycle.
  *
- * Theme-aware: respects .dark / .light class on <html>,
- * re-renders diagrams when the theme toggles.
+ * This script serves as a catch-all for any mermaid blocks that
+ * appear outside of the MDX component pipeline (e.g. raw HTML).
  */
+
 (function () {
   "use strict";
 
@@ -16,7 +17,7 @@
     return;
   }
 
-  /** Theme configs matching Schematic design tokens */
+  /* ---- Theme configs ---- */
   var DARK_THEME = {
     theme: "dark",
     themeVariables: {
@@ -55,19 +56,12 @@
     },
   };
 
-  function isDark() {
-    return document.documentElement.classList.contains("dark");
-  }
-
   function getThemeConfig() {
-    return isDark() ? DARK_THEME : LIGHT_THEME;
+    return document.documentElement.classList.contains("dark")
+      ? DARK_THEME
+      : LIGHT_THEME;
   }
 
-  /**
-   * Re-initialize mermaid with the current theme and re-process all blocks.
-   * Safe to call multiple times — processed blocks are tracked via
-   * data-mermaid-done and rendered figures via data-mermaid-rendered.
-   */
   function renderAll() {
     mermaid.initialize(getThemeConfig());
 
@@ -80,10 +74,6 @@
     }
   }
 
-  /**
-   * Replace a single <code class="language-mermaid"> block (inside a <pre>)
-   * with a styled <figure> containing the rendered SVG.
-   */
   function processBlock(el) {
     var pre = el.closest("pre");
     if (!pre) return;
@@ -97,7 +87,6 @@
         var figure = document.createElement("figure");
         figure.className =
           "my-10 overflow-hidden rounded-lg border border-border bg-background-elevated";
-        // Store the raw mermaid source + render id so we can re-render
         figure.setAttribute("data-mermaid-rendered", id);
         figure.setAttribute("data-mermaid-source", raw.trim());
 
@@ -117,17 +106,10 @@
         pre.replaceWith(figure);
       })
       .catch(function () {
-        // Render failed — remove the marker so a future scan retries.
-        // On SPA navigation, React may re-parent the DOM element during
-        // reconciliation, causing mermaid.render() to fail transiently.
         el.removeAttribute("data-mermaid-done");
       });
   }
 
-  /**
-   * Tear down all rendered diagrams back to raw <pre><code> blocks,
-   * then re-render with the current theme.
-   */
   function reRenderAll() {
     var rendered = document.querySelectorAll("[data-mermaid-rendered]");
     for (var r = 0; r < rendered.length; r++) {
@@ -142,67 +124,16 @@
 
       figure.replaceWith(pre);
     }
-
     renderAll();
   }
 
-  // === Initial render ===
+  /* ---- Initial scan ---- */
   renderAll();
 
-  // === Detect Next.js client-side SPA navigation ===
-  // RSC payloads stream via multiple self.__next_f.push() chunks.
-  // React renders each chunk as it arrives, and the MutationObserver
-  // resets its debounce on every chunk. But if a render fails before
-  // the final chunk (Bug: data-mermaid-done blocks retries), the
-  // diagram stays raw forever. So we also hook into history APIs
-  // and schedule a scan well after all chunks have landed.
-
-  function scheduleScan() {
-    setTimeout(function () {
-      renderAll();
-    }, 400);
-  }
-
-  // Monkey-patch history.pushState (Next.js <Link> navigation)
-  var origPush = history.pushState;
-  history.pushState = function () {
-    origPush.apply(this, arguments);
-    scheduleScan();
-  };
-
-  // Monkey-patch history.replaceState
-  var origReplace = history.replaceState;
-  history.replaceState = function () {
-    origReplace.apply(this, arguments);
-    scheduleScan();
-  };
-
-  // Listen for popstate (back/forward navigation)
-  window.addEventListener("popstate", function () {
-    scheduleScan();
-  });
-
-  // === MutationObserver fallback for dynamic content (non-navigation DOM changes) ===
-  var scanTimer = null;
-  var contentObserver = new MutationObserver(function () {
-    if (scanTimer !== null) clearTimeout(scanTimer);
-    scanTimer = setTimeout(function () {
-      renderAll();
-      scanTimer = null;
-    }, 300);
-  });
-
-  contentObserver.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
-
-  // === Watch for theme changes on <html> ===
-  var themeObserver = new MutationObserver(function () {
+  /* ---- Theme toggle ---- */
+  new MutationObserver(function () {
     reRenderAll();
-  });
-
-  themeObserver.observe(document.documentElement, {
+  }).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["class"],
   });

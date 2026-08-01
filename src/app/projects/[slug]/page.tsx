@@ -5,12 +5,12 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { ArrowLeft, Calendar, Clock, Globe, Tag } from "lucide-react";
 import { getContentBySlug, getContentSlugs } from "@/lib/content";
-import { ProjectImage, Callout } from "@/components/mdx";
+import { ProjectImage, Callout, MermaidPre } from "@/components/mdx";
 import { SITE } from "@/lib/constants";
 
 interface Props { params: Promise<{ slug: string }>; }
 
-const mdxComponents = { ProjectImage, Callout };
+const mdxComponents = { ProjectImage, Callout, pre: MermaidPre };
 
 export async function generateStaticParams() {
   const slugs = getContentSlugs("projects");
