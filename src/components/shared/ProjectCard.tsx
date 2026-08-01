@@ -98,28 +98,32 @@ export default function ProjectCard({ slug, meta }: ProjectCardProps) {
       {(meta.repo || meta.url) && (
         <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3">
           {meta.repo && (
-            <a
-              href={meta.repo}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-xs text-muted transition-colors hover:text-foreground"
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                window.open(meta.repo, "_blank", "noopener,noreferrer");
+              }}
+              className="inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-xs text-muted transition-colors hover:text-foreground"
             >
               <GithubIcon className="h-3.5 w-3.5" />
               Repository
-            </a>
+            </button>
           )}
           {meta.url && (
-            <a
-              href={meta.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 text-xs text-muted transition-colors hover:text-foreground"
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                window.open(meta.url, "_blank", "noopener,noreferrer");
+              }}
+              className="inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-xs text-muted transition-colors hover:text-foreground"
             >
               <Globe className="h-3.5 w-3.5" />
               Live Demo
-            </a>
+            </button>
           )}
         </div>
       )}
