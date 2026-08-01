@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
-import Script from "next/script";
 import { ArrowLeft, Calendar, Clock, Globe, Tag } from "lucide-react";
 import { getContentBySlug, getContentSlugs } from "@/lib/content";
 import { ProjectImage, Callout } from "@/components/mdx";
@@ -172,10 +171,6 @@ export default async function ProjectDetail({ params }: Props) {
             />
           </div>
         )}
-
-        {/* Mermaid diagrams — loaded via next/script for static export compatibility */}
-        <Script src="/js/mermaid.min.js" strategy="afterInteractive" />
-        <Script src="/js/mermaid-renderer.js" strategy="afterInteractive" />
 
         {/* Trace-rule divider */}
         <div className="trace-rule mb-12" />

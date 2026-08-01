@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import Header from "@/components/shared/Header";
 import Footer from "@/components/shared/Footer";
@@ -54,6 +55,8 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </ThemeProvider>
+        <Script src="/js/mermaid.min.js" strategy="afterInteractive" />
+        <Script src="/js/mermaid-renderer.js" strategy="afterInteractive" />
       </body>
     </html>
   );

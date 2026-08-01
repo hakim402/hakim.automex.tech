@@ -146,31 +146,18 @@
   // === Initial render ===
   renderAll();
 
-  // === Watch for blocks that appear later (React hydration) ===
-  var contentObserver = new MutationObserver(function (mutations) {
-    for (var m = 0; m < mutations.length; m++) {
-      var addedNodes = mutations[m].addedNodes;
-      for (var n = 0; n < addedNodes.length; n++) {
-        var node = addedNodes[n];
-        if (node.nodeType !== 1) continue;
-
-        if (
-          node.matches &&
-          node.matches("code.language-mermaid:not([data-mermaid-done])")
-        ) {
-          processBlock(node);
-        }
-
-        if (node.querySelectorAll) {
-          var nested = node.querySelectorAll(
-            "code.language-mermaid:not([data-mermaid-done])"
-          );
-          for (var k = 0; k < nested.length; k++) {
-            processBlock(nested[k]);
-          }
-        }
-      }
-    }
+  // === Watch for DOM changes (SPA navigation, dynamic content) ===
+  // Debounced full-document scan — more reliable than inspecting addedNodes.
+  // React reconciliation on client-side navigation may reparent existing
+  // <pre><code> nodes rather than adding new ones, which means addedNodes
+  // won't contain the mermaid blocks. A debounced full scan catches them all.
+  var scanTimer = null;
+  var contentObserver = new MutationObserver(function () {
+    if (scanTimer !== null) clearTimeout(scanTimer);
+    scanTimer = setTimeout(function () {
+      renderAll();
+      scanTimer = null;
+    }, 100);
   });
 
   contentObserver.observe(document.body, {
