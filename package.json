@@ -10,6 +10,7 @@
     "contact-api": "node contact-server.js"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "gray-matter": "^4.0.3",
     "lucide-react": "^1.28.0",
     "mermaid": "^11.16.0",

@@ -2,6 +2,8 @@
 // Run alongside the static site:  node contact-server.js
 // Listens on CONTACT_API_PORT (default 3500).
 
+require("dotenv").config();
+
 const http = require("http");
 const nodemailer = require("nodemailer");
 
