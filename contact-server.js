@@ -2,7 +2,7 @@
 // Run alongside the static site:  node contact-server.js
 // Listens on CONTACT_API_PORT (default 3500).
 
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const http = require("http");
 const nodemailer = require("nodemailer");
@@ -35,6 +35,7 @@ const TO_EMAIL = process.env.TO_EMAIL || process.env.SMTP_USER;
 // ── Validate on startup ───────────────────────────────────────────────
 if (!SMTP_USER || !SMTP_PASS) {
   console.error("[contact-server] SMTP_USER and SMTP_PASS env vars are required.");
+  console.error("[contact-server] Looking for .env at:", __dirname + "/.env");
   process.exit(1);
 }
 

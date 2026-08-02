@@ -3,7 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { Send, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_CONTACT_API_URL || "http://localhost:3500/api/contact";
+// Dev: hit the API server directly on port 3500.
+// Prod: use a relative URL so nginx can proxy to the API server.
+const IS_DEV = typeof window !== "undefined" && window.location.hostname === "localhost";
+const API_URL = process.env.NEXT_PUBLIC_CONTACT_API_URL || (IS_DEV ? "http://localhost:3500/api/contact" : "/api/contact");
 
 type Status = "idle" | "loading" | "sent" | "error";
 
