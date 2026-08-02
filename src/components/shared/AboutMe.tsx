@@ -1,38 +1,83 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import {
   Code2,
-  Database,
-  Cloud,
-  Cpu,
-  FlaskConical,
-  Layers,
+  Sparkles,
+  ShieldCheck,
   GraduationCap,
-  MapPin,
-  Globe2,
-  Building2,
   Award,
   Star,
   Briefcase,
   Rocket,
-  Sparkles,
   Target,
+  Cpu,
 } from "lucide-react";
+
+/** Fades a block up into place the first time it scrolls into view. */
+function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
+      className={`transition-all duration-700 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 const strengths = [
   {
     icon: Code2,
     title: "Full-Stack Engineering",
-    desc: "TypeScript, React, Next.js, Node.js — end-to-end ownership from pixel to database.",
+    desc: "Next.js, React, Laravel, Django end-to-end platforms from database to deployment.",
   },
   {
-    icon: Cloud,
-    title: "Cloud & Infrastructure",
-    desc: "AWS, Docker, Kubernetes, Terraform — multi-cloud CI/CD at production scale.",
+    icon: Sparkles,
+    title: "Applied AI & NLP",
+    desc: "Recommendation engines, automated text generation, and conversational agents shipped to production.",
   },
   {
-    icon: Cpu,
-    title: "Machine Learning",
-    desc: "Python, scikit-learn, XGBoost — shipped models that saved $1.2M annually.",
+    icon: ShieldCheck,
+    title: "Application Security",
+    desc: "OWASP Top 10 audits, JWT/RBAC authentication, and CI/CD vulnerability scanning.",
   },
+];
+
+const stats = [
+  { value: "4+", label: "Years building" },
+  { value: "3", label: "Companies / roles led" },
+  { value: "9+", label: "Milestones & certs" },
 ];
 
 type MilestoneCategory =
@@ -75,7 +120,7 @@ const categoryMeta: Record<
       "border-accent-secondary/20 bg-accent-secondary/5 text-accent-secondary",
   },
   Future: {
-    icon: Globe2,
+    icon: Rocket,
     className: "border-border bg-background text-muted",
   },
 };
@@ -107,6 +152,14 @@ const milestones: Milestone[] = [
     icon: Star,
   },
   {
+    year: "2023",
+    title: "Started Freelancing on Upwork",
+    desc: "Built end-to-end web and mobile apps with React, Django, Laravel, Next.js, and Flutter, integrating AI/ML solutions for clients.",
+    category: "Career",
+    status: "completed",
+    icon: Code2,
+  },
+  {
     year: "2025",
     title: "Bachelor's Graduation",
     desc: "Graduated from Kabul University with a Bachelor's degree in Information Systems.",
@@ -121,6 +174,14 @@ const milestones: Milestone[] = [
     category: "Career",
     status: "completed",
     highlighted: true,
+    icon: Briefcase,
+  },
+  {
+    year: "2026",
+    title: "Joined JAHEZ Trade Co",
+    desc: "Full-Stack Developer & Digital Operations Specialist, designing and maintaining full-stack applications and internal tools.",
+    category: "Career",
+    status: "completed",
     icon: Briefcase,
   },
   {
@@ -166,9 +227,17 @@ export default function AboutMe() {
       {/* Subtle background dots */}
       <div className="pointer-events-none absolute inset-0 bg-particle-dots" />
 
+      {/* Giant faded section numeral — depth, not clutter */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 select-none font-display text-[9rem] font-bold text-foreground/3 sm:text-[13rem]"
+      >
+        01
+      </span>
+
       <div className="relative mx-auto max-w-6xl">
         {/* Section header */}
-        <div className="mb-16 text-center">
+        <Reveal className="mb-20 text-center">
           <span className="mono text-[11px] font-medium uppercase tracking-[0.2em] text-accent-secondary">
             About Me
           </span>
@@ -177,117 +246,121 @@ export default function AboutMe() {
             <span className="text-accent">Future Grad Student.</span>
           </h2>
           <div className="trace-rule mx-auto mt-5 h-px w-20" />
-        </div>
+        </Reveal>
 
-        {/* Two-column bio + image */}
-        <div className="mb-20 flex flex-col items-center gap-16 lg:flex-row lg:items-start">
-          {/* Bio */}
-          <div className="flex-1 space-y-5 text-base leading-relaxed text-muted">
-            <p>
-              {" "}
-              I&apos;m a full-stack software engineer, software architect, and
-              entrepreneur passionate about building enterprise applications,
-              AI-powered solutions, and scalable cloud systems. Over the past
-              four years, I&apos;ve designed and developed production-ready web
-              platforms, enterprise software, intelligent automation tools, and
-              secure backend systems using modern technologies such as Next.js,
-              TypeScript, PostgreSQL, Prisma, and AI APIs. My focus is on
-              creating reliable, maintainable, and user-centric software that
-              solves real-world business challenges.{" "}
-            </p>{" "}
-            <p>
-              {" "}
-              I&apos;m currently preparing for graduate studies in Computer
-              Science in Canada or the United States, where I aim to advance my
-              research in{" "}
-              <strong className="text-foreground">Agentic AI</strong>,{" "}
-              <strong className="text-foreground">Software Engineering</strong>,{" "}
-              <strong className="text-foreground">Distributed Systems</strong>,
-              and{" "}
-              <strong className="text-foreground">
-                Enterprise AI Applications
-              </strong>
-              . My long-term vision is to bridge academic research and industry
-              by building intelligent systems that automate business operations
-              and deliver meaningful real-world impact.{" "}
-            </p>{" "}
-            <p>
-              {" "}
-              This portfolio documents my journey from Information Systems
-              student to CTO, founder, and software engineer, showcasing the
-              projects I&apos;ve built, the challenges I&apos;ve solved, and my
-              continued pursuit of innovation, technical excellence, and
-              lifelong learning.{" "}
-            </p>
-            {/* Quick stats */}
-            <div className="grid grid-cols-3 gap-4 pt-4">
-              {[
-                { icon: GraduationCap, label: "Target", value: "M.Sc. CS" },
-                { icon: MapPin, label: "Location", value: "Canada" },
-                { icon: Globe2, label: "Focus", value: "Systems + ML" },
-              ].map(({ icon: Icon, label, value }) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-border bg-background-elevated p-4 text-center transition-colors hover:border-accent-secondary/50"
-                >
-                  <Icon className="mx-auto mb-1 h-4 w-4 text-accent-secondary" />
-                  <p className="mono text-[9px] font-medium uppercase tracking-wider text-muted">
-                    {label}
-                  </p>
-                  <p className="mt-0.5 text-xs font-semibold text-foreground">
-                    {value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Image + strengths */}
-          <div className="flex-1 space-y-6">
-            {/* Profile image */}
-            <div className="glow-border relative overflow-hidden rounded-2xl border border-border">
+        {/* Photo + bio */}
+        <div className="mb-24 flex flex-col items-center gap-14 lg:flex-row lg:items-start lg:gap-16">
+          {/* Photo, glow-blob treatment, floating tag */}
+          <Reveal className="relative w-full max-w-70 shrink-0">
+            <div
+              aria-hidden="true"
+              className="absolute -inset-6 -z-10 rounded-full bg-accent-secondary/15 blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute -bottom-8 -right-8 -z-10 h-32 w-32 rounded-full bg-accent/10 blur-3xl"
+            />
+            <div className="glow-border relative aspect-4/5 overflow-hidden rounded-2xl border border-border/60 bg-background-elevated shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop"
-                alt="Workspace"
-                className="h-56 w-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
+                src="/images/hakim/hakim3.png"
+                alt="Hakimullah Rahimi Safi"
+                className="h-full w-full object-cover grayscale transition-all duration-700 hover:grayscale-0"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
-              <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-accent-secondary animate-pulse" />
-                <span className="mono text-[10px] font-medium uppercase tracking-[0.15em] text-accent-secondary">
-                  Canada &middot; MST
-                </span>
-              </div>
+              <div className="absolute inset-0 bg-linear-to-t from-background/70 via-transparent to-transparent" />
             </div>
 
-            {/* Strengths cards */}
-            <div className="space-y-3">
-              {strengths.map(({ icon: Icon, title, desc }) => (
+            {/* Floating role tag */}
+            <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 rounded-xl border border-border bg-background-elevated px-4 py-3 text-center shadow-xl">
+              <p className="mono text-[10px] font-semibold uppercase tracking-[0.15em] text-accent-secondary">
+                CTO &amp; Founder
+              </p>
+              <p className="mt-0.5 text-[11px] text-muted">
+                Kabul, Afghanistan
+              </p>
+            </div>
+          </Reveal>
+
+          {/* Bio */}
+          <Reveal delay={100} className="flex-1 space-y-6 pt-2">
+            <p className="font-display text-xl font-medium leading-snug text-foreground sm:text-2xl">
+              I build enterprise software and secure systems by day{" "}
+              <span className="text-accent">
+                and I&apos;m preparing to research the AI and security
+                problems behind them
+              </span>{" "}
+              by trade.
+            </p>
+
+            <div className="space-y-4 text-base leading-relaxed text-muted">
+              <p>
+                Over the past four years I&apos;ve designed and shipped
+                production-ready web platforms, enterprise software,
+                intelligent automation tools, and secure backend systems using
+                Next.js, TypeScript, PostgreSQL, Prisma, and AI APIs as a
+                CTO, a two-time founder, and a full-stack developer.
+              </p>
+              <p>
+                I&apos;m now preparing for graduate studies in Computer
+                Science in Canada or the United States, to advance my research
+                in{" "}
+                <strong className="text-foreground">Agentic AI</strong>,{" "}
+                <strong className="text-foreground">
+                  Software Engineering
+                </strong>
+                ,{" "}
+                <strong className="text-foreground">
+                  Distributed Systems
+                </strong>
+                , and{" "}
+                <strong className="text-foreground">
+                  Enterprise AI Applications
+                </strong>{" "}
+                bridging academic research and industry practice.
+              </p>
+            </div>
+
+            {/* Big stat row */}
+            <div className="flex divide-x divide-border pt-2">
+              {stats.map((stat) => (
                 <div
-                  key={title}
-                  className="flex items-start gap-4 rounded-xl border border-border bg-background-elevated p-4 transition-all hover:border-accent-secondary/40 hover:-translate-y-0.5"
+                  key={stat.label}
+                  className="flex-1 px-6 text-center first:pl-0 last:pr-0"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-secondary/10">
-                    <Icon className="h-5 w-5 text-accent-secondary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {title}
-                    </p>
-                    <p className="mt-0.5 text-xs leading-relaxed text-muted">
-                      {desc}
-                    </p>
-                  </div>
+                  <p className="font-display text-4xl font-bold text-foreground sm:text-5xl">
+                    {stat.value}
+                  </p>
+                  <p className="mono mt-1 text-[10px] uppercase tracking-widest text-muted">
+                    {stat.label}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
+        </div>
+
+        {/* Strengths — horizontal row, cascading in */}
+        <div className="mb-24 grid gap-4 sm:grid-cols-3">
+          {strengths.map(({ icon: Icon, title, desc }, i) => (
+            <Reveal key={title} delay={i * 120}>
+              <div className="group h-full rounded-2xl border border-border bg-background-elevated p-6 transition-all hover:-translate-y-1 hover:border-accent-secondary/40 hover:shadow-xl">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-secondary/10 transition-colors group-hover:bg-accent-secondary/20">
+                  <Icon className="h-5 w-5 text-accent-secondary" />
+                </div>
+                <p className="mt-4 text-sm font-semibold text-foreground">
+                  {title}
+                </p>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                  {desc}
+                </p>
+              </div>
+            </Reveal>
+          ))}
         </div>
 
         {/* Academic & Professional Journey */}
         <div>
-          <div className="mb-10 text-center">
+          <Reveal className="mb-10 text-center">
             <span className="mono text-[11px] font-medium uppercase tracking-[0.2em] text-accent-secondary">
               Journey
             </span>
@@ -295,17 +368,17 @@ export default function AboutMe() {
               Academic &amp; Professional Timeline
             </h3>
             <p className="mx-auto mt-2 max-w-lg text-sm text-muted">
-              From IT education to founding AI companies a path of continuous
-              growth.
+              From IT education to founding AI companies a path of
+              continuous growth.
             </p>
-          </div>
+          </Reveal>
 
           <div className="relative mx-auto max-w-2xl">
             {/* Vertical line */}
             <div className="absolute left-5.75 top-0 h-full w-px bg-border" />
 
             <div className="space-y-0">
-              {milestones.map((item) => {
+              {milestones.map((item, i) => {
                 const cat = categoryMeta[item.category];
                 const CatIcon = cat.icon;
 
@@ -314,8 +387,9 @@ export default function AboutMe() {
                 const isFuture = item.status === "future";
 
                 return (
-                  <div
+                  <Reveal
                     key={item.year + item.title}
+                    delay={Math.min(i, 6) * 80}
                     className="relative flex gap-5 pb-10 last:pb-0"
                   >
                     {/* Node */}
@@ -381,7 +455,7 @@ export default function AboutMe() {
                         {item.desc}
                       </p>
                     </div>
-                  </div>
+                  </Reveal>
                 );
               })}
             </div>

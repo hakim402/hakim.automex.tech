@@ -52,11 +52,11 @@ export default function ProjectGrid({ projects, categories }: Props) {
       )}
 
       {/* Trace-rule divider */}
-      <div className="trace-rule mb-12" />
+      <div className="trace-rule mx-auto mb-12 h-px w-full max-w-5xl" />
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border-strong bg-background-elevated p-16 text-center">
+        <div className="rounded-xl border border-dashed border-border-strong bg-background-elevated p-16 text-center">
           <FolderCode className="mx-auto h-10 w-10 text-muted" />
           <p className="mt-4 text-muted">
             No case studies yet. Add .mdx files to src/content/projects/.

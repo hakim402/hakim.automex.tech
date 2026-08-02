@@ -33,15 +33,13 @@ export default function CertificationsPage() {
 
       {/* Header */}
       <div className="mb-12 reveal">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-accent">
-            Credentials
-          </span>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <span className="mono text-[11px] font-medium uppercase tracking-[0.2em] text-accent-secondary">
+          Credentials
+        </span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Certifications
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-muted">
+        <p className="mt-3 max-w-2xl text-base text-muted">
           Professional certifications, online courses from Coursera &amp; edX,
           and university credentials.
         </p>
@@ -50,29 +48,29 @@ export default function CertificationsPage() {
       {/* Stats banner */}
       {certifications.length > 0 && (
         <div className="mb-12 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-background-elevated p-5">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+          <div className="rounded-xl border border-border bg-background-elevated p-5">
+            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
               <Award className="h-4.5 w-4.5 text-accent" />
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="font-display text-2xl font-bold text-foreground">
               {certifications.length}
             </p>
             <p className="mt-0.5 text-xs text-muted">Total Certifications</p>
           </div>
-          <div className="rounded-lg border border-border bg-background-elevated p-5">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-secondary/10">
+          <div className="rounded-xl border border-border bg-background-elevated p-5">
+            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-secondary/10">
               <GraduationCap className="h-4.5 w-4.5 text-accent-secondary" />
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="font-display text-2xl font-bold text-foreground">
               {uniqueIssuers}
             </p>
             <p className="mt-0.5 text-xs text-muted">Platforms &amp; Issuers</p>
           </div>
-          <div className="rounded-lg border border-border bg-background-elevated p-5">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+          <div className="rounded-xl border border-border bg-background-elevated p-5">
+            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
               <Globe className="h-4.5 w-4.5 text-accent" />
             </div>
-            <p className="text-2xl font-bold text-foreground">
+            <p className="font-display text-2xl font-bold text-foreground">
               {featuredCount}
             </p>
             <p className="mt-0.5 text-xs text-muted">Featured Credentials</p>

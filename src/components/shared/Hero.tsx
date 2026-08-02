@@ -106,7 +106,7 @@ function TiltCard() {
     >
       <div
         ref={cardRef}
-        className="glow-border relative aspect-[4/5] overflow-hidden rounded-2xl border border-border/50 bg-background-elevated transition-transform duration-200 ease-out will-change-transform"
+        className="glow-border relative aspect-4/5 overflow-hidden rounded-2xl border border-border/50 bg-background-elevated transition-transform duration-200 ease-out will-change-transform"
       >
         <img
           src="/images/hakim/hakim2.png"

@@ -41,15 +41,13 @@ export default function ContactPage() {
 
       {/* Header */}
       <div className="mb-12 reveal">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-accent">
-            Connect
-          </span>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <span className="mono text-[11px] font-medium uppercase tracking-[0.2em] text-accent-secondary">
+          Connect
+        </span>
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Get in Touch
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-muted">
+        <p className="mt-3 max-w-2xl text-base text-muted">
           Open to collaborations, research discussions, and opportunities in
           software engineering, AI integration, and distributed systems.
         </p>
@@ -57,11 +55,11 @@ export default function ContactPage() {
 
       <div className="grid gap-10 lg:grid-cols-5">
         {/* Contact info sidebar */}
-        <aside className="space-y-8 lg:col-span-2">
+        <aside className="space-y-6 lg:col-span-2">
           {/* Email */}
-          <div className="rounded-lg border border-border bg-background-elevated p-6">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-              <Mail className="h-5 w-5 text-accent" />
+          <div className="rounded-xl border border-border bg-background-elevated p-6">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
+              <Mail className="h-4.5 w-4.5 text-accent" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Email</h3>
             <a
@@ -71,35 +69,35 @@ export default function ContactPage() {
               {CONTACT_EMAIL}
             </a>
             <p className="mt-2 text-xs text-muted">
-              I typically respond within 24–48 hours.
+              I typically respond within 24-48 hours.
             </p>
           </div>
 
           {/* Location */}
-          <div className="rounded-lg border border-border bg-background-elevated p-6">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-              <MapPin className="h-5 w-5 text-accent" />
+          <div className="rounded-xl border border-border bg-background-elevated p-6">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-secondary/10">
+              <MapPin className="h-4.5 w-4.5 text-accent-secondary" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Location</h3>
             <p className="mt-1 text-sm text-muted">
-              Canada
+              Kabul, Afghanistan
             </p>
             <p className="mt-2 text-xs text-muted">
               Open to remote opportunities worldwide.
             </p>
           </div>
 
-          {/* Response time */}
-          <div className="rounded-lg border border-border bg-background-elevated p-6">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-              <Clock className="h-5 w-5 text-accent" />
+          {/* Office hours */}
+          <div className="rounded-xl border border-border bg-background-elevated p-6">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-secondary/10">
+              <Clock className="h-4.5 w-4.5 text-accent-secondary" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Office Hours</h3>
             <p className="mt-1 text-sm text-muted">
-              Monday – Friday
+              Monday &ndash; Friday
             </p>
             <p className="text-xs text-muted">
-              9:00 AM – 6:00 PM EST
+              9:00 AM &ndash; 6:00 PM GMT+4:30
             </p>
           </div>
 
@@ -109,7 +107,7 @@ export default function ContactPage() {
               href={SOCIAL_LINKS.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background-elevated px-4 py-2.5 text-sm text-muted transition-colors hover:border-accent-secondary/30 hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-background-elevated px-4 py-2.5 text-sm text-muted transition-colors hover:border-accent-secondary/30 hover:text-foreground"
             >
               <GithubIcon className="h-4 w-4" />
               GitHub
@@ -118,7 +116,7 @@ export default function ContactPage() {
               href={SOCIAL_LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background-elevated px-4 py-2.5 text-sm text-muted transition-colors hover:border-accent-secondary/30 hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-background-elevated px-4 py-2.5 text-sm text-muted transition-colors hover:border-accent-secondary/30 hover:text-foreground"
             >
               <LinkedinIcon className="h-4 w-4" />
               LinkedIn
@@ -128,7 +126,7 @@ export default function ContactPage() {
 
         {/* Form */}
         <section className="lg:col-span-3">
-          <div className="rounded-lg border border-border bg-background-elevated p-6 sm:p-8">
+          <div className="rounded-xl border border-border bg-background-elevated p-6 sm:p-8">
             <h2 className="mb-6 text-lg font-semibold text-foreground">
               Send a Message
             </h2>

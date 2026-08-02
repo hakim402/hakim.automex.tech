@@ -62,23 +62,23 @@ export default async function AchievementDetail({ params }: Props) {
       </nav>
 
       {/* Header */}
-      <header className="mb-10 space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-xs font-medium uppercase tracking-wider text-accent">
+      <header className="mb-10">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mono text-[11px] font-medium uppercase tracking-[0.2em] text-accent-secondary">
             {meta.category}
           </span>
           {meta.featured && (
-            <span className="rounded-full border border-accent-secondary/20 bg-accent-secondary/10 px-2.5 py-1 text-xs font-medium text-accent-secondary">
+            <span className="rounded-full border border-accent-secondary/20 bg-accent-secondary/10 px-2 py-0.5 text-[10px] font-medium text-accent-secondary">
               Featured
             </span>
           )}
         </div>
 
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           {meta.title}
         </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-muted">
+        <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted">
           {meta.date && (
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5" />
@@ -94,13 +94,20 @@ export default async function AchievementDetail({ params }: Props) {
 
       {/* Image */}
       {meta.image && (
-        <div className="mb-10 flex justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={meta.image}
-            alt={meta.title}
-            className="h-32 w-32 rounded-xl object-cover shadow-md"
-          />
+        <div className="mb-10">
+          <div className="glow-border relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-border/50 bg-background-elevated">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={meta.image}
+              alt={meta.title}
+              className="max-h-[420px] w-full object-contain"
+            />
+            {/* Blueprint corner ticks */}
+            <span className="absolute left-3 top-3 h-3 w-3 border-l border-t border-accent-secondary/60" />
+            <span className="absolute right-3 top-3 h-3 w-3 border-r border-t border-accent-secondary/60" />
+            <span className="absolute bottom-3 left-3 h-3 w-3 border-b border-l border-accent-secondary/60" />
+            <span className="absolute bottom-3 right-3 h-3 w-3 border-b border-r border-accent-secondary/60" />
+          </div>
         </div>
       )}
 

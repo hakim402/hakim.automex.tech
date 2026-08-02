@@ -10,7 +10,7 @@ export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/certifications", label: "Certifications" },
-  { href: "/publications", label: "Publications" },
+  // { href: "/publications", label: "Publications" },
   { href: "/achievements", label: "Achievements" },
   { href: "/contact", label: "Contact" },
 ];

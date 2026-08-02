@@ -53,11 +53,11 @@ export default function Timeline({ items, categories }: TimelineProps) {
       )}
 
       {/* Trace-rule */}
-      <div className="trace-rule mb-12" />
+      <div className="trace-rule mx-auto mb-12 h-px w-full max-w-5xl" />
 
       {/* Timeline */}
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border-strong bg-background-elevated p-12 text-center">
+        <div className="rounded-xl border border-dashed border-border-strong bg-background-elevated p-12 text-center">
           <Award className="mx-auto h-8 w-8 text-muted" />
           <p className="mt-3 text-sm text-muted">
             No achievements match this category.
@@ -90,10 +90,10 @@ export default function Timeline({ items, categories }: TimelineProps) {
                 {/* Card */}
                 <Link
                   href={`/achievements/${item.slug}`}
-                  className="group block rounded-lg border border-border bg-background-elevated p-5 transition-all hover:-translate-y-0.5 hover:border-accent-secondary/30"
+                  className="group block rounded-xl border border-border bg-background-elevated p-5 transition-all hover:border-accent-secondary/30"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span className="font-mono text-xs font-medium uppercase tracking-wider text-accent">
+                    <span className="mono text-[11px] font-medium uppercase tracking-[0.15em] text-accent-secondary">
                       {item.meta.category}
                     </span>
                     {item.meta.date && (

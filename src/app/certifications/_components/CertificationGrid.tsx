@@ -52,7 +52,7 @@ export default function CertificationGrid({ items, categories }: Props) {
       )}
 
       {/* Trace-rule */}
-      <div className="trace-rule mb-12" />
+      <div className="trace-rule mx-auto mb-12 h-px w-full max-w-5xl" />
 
       {/* Grid */}
       {filtered.length === 0 ? (

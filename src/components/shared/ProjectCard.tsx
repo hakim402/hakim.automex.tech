@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { Calendar, Clock, Globe } from "lucide-react";
+import { Calendar, Clock, ExternalLink } from "lucide-react";
 import type { ContentMeta } from "@/lib/content";
 
 interface ProjectCardProps {
@@ -28,10 +28,10 @@ export default function ProjectCard({ slug, meta }: ProjectCardProps) {
   return (
     <Link
       href={`/projects/${slug}`}
-      className="group glow-border block overflow-hidden rounded-lg border border-border bg-background-elevated p-5 transition-all hover:-translate-y-0.5"
+      className="group block rounded-xl border border-border bg-background-elevated transition-all hover:border-accent-secondary/30"
     >
       {meta.image && (
-        <div className="mb-4 overflow-hidden rounded-md">
+        <div className="overflow-hidden rounded-t-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={meta.image}
@@ -40,93 +40,65 @@ export default function ProjectCard({ slug, meta }: ProjectCardProps) {
           />
         </div>
       )}
-      <div className="flex items-center gap-2 text-xs font-medium text-accent">
-        <span className="font-mono uppercase tracking-wider">
-          {meta.category}
-        </span>
-        {meta.featured && (
-          <span className="rounded-full border border-accent-secondary/20 bg-accent-secondary/10 px-2 py-0.5 text-accent-secondary">
-            Featured
-          </span>
-        )}
-      </div>
-      <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground">
-        {meta.title}
-      </h3>
-      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">
-        {meta.summary}
-      </p>
 
-      {/* Metadata row */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
-        {meta.date && (
-          <span className="inline-flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
-            {new Date(meta.date).toLocaleDateString("en-CA", {
-              year: "numeric",
-              month: "short",
-            })}
+      <div className="p-5">
+        {/* Category + featured */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="mono text-[11px] font-medium uppercase tracking-[0.15em] text-accent-secondary">
+            {meta.category}
           </span>
-        )}
-        {meta.readingTime && (
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {meta.readingTime} min
-          </span>
-        )}
-      </div>
-
-      {meta.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {meta.tags.slice(0, 4).map((tag) => (
-            <span
-              key={tag}
-              className="max-w-35 truncate rounded-md border border-border bg-background px-2 py-0.5 font-mono text-[11px] text-muted"
-            >
-              {tag}
-            </span>
-          ))}
-          {meta.tags.length > 4 && (
-            <span className="rounded-md border border-border bg-background px-2 py-0.5 font-mono text-[11px] text-muted">
-              +{meta.tags.length - 4}
+          {meta.featured && (
+            <span className="rounded-full border border-accent-secondary/20 bg-accent-secondary/10 px-2 py-0.5 text-[10px] font-medium text-accent-secondary">
+              Featured
             </span>
           )}
         </div>
-      )}
 
-      {/* Quick links */}
-      {(meta.repo || meta.url) && (
-        <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3">
-          {meta.repo && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                window.open(meta.repo, "_blank", "noopener,noreferrer");
-              }}
-              className="inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-xs text-muted transition-colors hover:text-foreground"
-            >
-              <GithubIcon className="h-3.5 w-3.5" />
-              Repository
-            </button>
+        <h3 className="mt-2 text-lg font-semibold leading-snug text-foreground">
+          {meta.title}
+        </h3>
+
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">
+          {meta.summary}
+        </p>
+
+        {/* Metadata */}
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+          {meta.date && (
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              {new Date(meta.date).toLocaleDateString("en-CA", {
+                year: "numeric",
+                month: "short",
+              })}
+            </span>
           )}
-          {meta.url && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                window.open(meta.url, "_blank", "noopener,noreferrer");
-              }}
-              className="inline-flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-xs text-muted transition-colors hover:text-foreground"
-            >
-              <Globe className="h-3.5 w-3.5" />
-              Live Demo
-            </button>
+          {meta.readingTime && (
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {meta.readingTime} min read
+            </span>
           )}
         </div>
-      )}
+
+        {/* Quick links */}
+        {(meta.repo || meta.url) && (
+          <div className="mt-3 flex items-center gap-3 border-t border-border/50 pt-3 text-xs text-muted">
+            {meta.repo && (
+              <span className="inline-flex items-center gap-1 transition-colors group-hover:text-accent-secondary">
+                <GithubIcon className="h-3.5 w-3.5" />
+                Repository
+              </span>
+            )}
+            {meta.url && (
+              <span className="inline-flex items-center gap-1 transition-colors group-hover:text-accent-secondary">
+                <ExternalLink className="h-3.5 w-3.5" />
+                Live Demo
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </Link>
   );
 }

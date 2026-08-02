@@ -8,13 +8,13 @@ export default function CertificationCard({ slug, meta }: Props) {
   return (
     <Link
       href={`/certifications/${slug}`}
-      className="group block rounded-lg border border-border bg-background-elevated p-5 transition-all hover:-translate-y-0.5 hover:border-accent-secondary/30"
+      className="group block rounded-xl border border-border bg-background-elevated p-5 transition-all hover:border-accent-secondary/30"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           {/* Issuer badge */}
           {meta.issuer && (
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-accent-secondary/20 bg-accent-secondary/5 px-2.5 py-0.5 text-[11px] font-medium text-accent-secondary">
               <Building2 className="h-3 w-3" />
               {meta.issuer}
             </div>
@@ -46,7 +46,7 @@ export default function CertificationCard({ slug, meta }: Props) {
         </div>
 
         {meta.image && (
-          <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border border-border">
+          <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-border/50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={meta.image}
