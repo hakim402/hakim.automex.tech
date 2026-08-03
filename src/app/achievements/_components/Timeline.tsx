@@ -15,9 +15,7 @@ export default function Timeline({ items, categories }: TimelineProps) {
   const [active, setActive] = useState("All");
 
   const filtered =
-    active === "All"
-      ? items
-      : items.filter((i) => i.meta.category === active);
+    active === "All" ? items : items.filter((i) => i.meta.category === active);
 
   return (
     <>
@@ -73,14 +71,14 @@ export default function Timeline({ items, categories }: TimelineProps) {
       ) : (
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-[19px] top-2 h-[calc(100%-1rem)] w-px bg-border sm:left-[27px]" />
+          <div className="absolute left-4.75 top-2 h-[calc(100%-1rem)] w-px bg-border sm:left-6.75" />
 
           <ul className="space-y-8">
             {filtered.map((item, idx) => (
               <li key={item.slug} className="relative pl-14 sm:pl-16">
                 {/* Timeline dot */}
                 <div
-                  className={`absolute left-[11px] top-2.5 h-4 w-4 rounded-full border-2 sm:left-[19px] ${
+                  className={`absolute left-2.75 top-2.5 h-4 w-4 rounded-full border-2 sm:left-4.75 ${
                     item.meta.featured
                       ? "border-accent-secondary bg-background-elevated ring-4 ring-accent-secondary/10"
                       : "border-accent/60 bg-background-elevated"
@@ -99,14 +97,11 @@ export default function Timeline({ items, categories }: TimelineProps) {
                     {item.meta.date && (
                       <span className="inline-flex items-center gap-1 text-xs text-muted">
                         <Calendar className="h-3 w-3" />
-                        {new Date(item.meta.date).toLocaleDateString(
-                          "en-CA",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }
-                        )}
+                        {new Date(item.meta.date).toLocaleDateString("en-CA", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </span>
                     )}
                     {item.meta.featured && (

@@ -11,12 +11,12 @@ export default function PublicationCard({ slug, meta }: Props) {
   return (
     <Link
       href={`/publications/${slug}`}
-      className="group block rounded-lg border border-border bg-background-elevated p-5 transition-all hover:-translate-y-0.5 hover:border-accent-secondary/30"
+      className="group block rounded-xl border border-border bg-background-elevated p-5 transition-all hover:border-accent-secondary/30"
     >
       <div className="min-w-0 flex-1">
         {/* Category + journal badges */}
         <div className="mb-2.5 flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-accent/20 bg-accent/5 px-2.5 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wider text-accent">
+          <span className="mono text-[11px] font-medium uppercase tracking-[0.15em] text-accent-secondary">
             {meta.category}
           </span>
           {meta.journal && (

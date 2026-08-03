@@ -6,7 +6,8 @@ import { getAllContent, getCategories } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Achievements",
-  description: "Awards, honors, and milestones from my academic and professional journey.",
+  description:
+    "Awards, honors, and milestones from my academic and professional journey.",
 };
 
 export default function AchievementsPage() {
@@ -73,9 +74,6 @@ export default function AchievementsPage() {
           </div>
         </div>
       )}
-
-      {/* Trace-rule divider */}
-      <div className="trace-rule mx-auto mb-12 h-px w-full max-w-5xl" />
 
       {achievements.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border-strong bg-background-elevated p-16 text-center">

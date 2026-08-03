@@ -100,7 +100,7 @@ export default async function AchievementDetail({ params }: Props) {
             <img
               src={meta.image}
               alt={meta.title}
-              className="max-h-[420px] w-full object-contain"
+              className="max-h-105 w-full object-contain"
             />
             {/* Blueprint corner ticks */}
             <span className="absolute left-3 top-3 h-3 w-3 border-l border-t border-accent-secondary/60" />

@@ -26,7 +26,7 @@ export default function PublicationList({ items, categories }: Props) {
           <button
             type="button"
             onClick={() => setActive("All")}
-            className={`rounded-full border px-3 py-1 font-mono text-xs font-medium transition-colors ${
+            className={`rounded-xl border px-3 py-1 font-mono text-xs font-medium transition-colors ${
               active === "All"
                 ? "border-accent/50 bg-accent/10 text-accent"
                 : "border-border bg-background-elevated text-muted hover:border-accent-secondary/40 hover:text-accent-secondary"
@@ -39,7 +39,7 @@ export default function PublicationList({ items, categories }: Props) {
               key={cat}
               type="button"
               onClick={() => setActive(cat)}
-              className={`rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
+              className={`rounded-xl border px-3 py-1 font-mono text-xs transition-colors ${
                 active === cat
                   ? "border-accent/50 bg-accent/10 font-medium text-accent"
                   : "border-border bg-background-elevated text-muted hover:border-accent-secondary/40 hover:text-accent-secondary"
@@ -52,11 +52,11 @@ export default function PublicationList({ items, categories }: Props) {
       )}
 
       {/* Trace-rule */}
-      <div className="trace-rule mb-12" />
+      <div className="trace-rule mx-auto mb-12 h-px w-full" />
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border-strong bg-background-elevated p-12 text-center">
+        <div className="rounded-xl border border-dashed border-border-strong bg-background-elevated p-12 text-center">
           <FileText className="mx-auto h-8 w-8 text-muted" />
           <p className="mt-3 text-sm text-muted">
             No publications match this category.
@@ -70,7 +70,7 @@ export default function PublicationList({ items, categories }: Props) {
           </button>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-4">
           {filtered.map((pub) => (
             <PublicationCard key={pub.slug} slug={pub.slug} meta={pub.meta} />
           ))}
