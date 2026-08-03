@@ -2,7 +2,28 @@
 // Run alongside the static site:  node contact-server.js
 // Listens on CONTACT_API_PORT (default 3500).
 
-require("dotenv").config({ path: __dirname + "/.env" });
+// Load .env manually (no dependencies required)
+(function loadEnv(filePath) {
+  const fs = require("fs");
+  try {
+    const content = fs.readFileSync(filePath, "utf-8");
+    for (const line of content.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eqIdx = trimmed.indexOf("=");
+      if (eqIdx === -1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      let value = trimmed.slice(eqIdx + 1).trim();
+      // strip surrounding quotes
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      if (key && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  } catch { /* .env file is optional */ }
+})(__dirname + "/.env");
 
 const http = require("http");
 const nodemailer = require("nodemailer");
